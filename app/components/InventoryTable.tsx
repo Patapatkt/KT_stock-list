@@ -5,6 +5,8 @@ import type { stockRow } from "../libs/getProducts"
 import { ColumnDef, createPaginatedRowModel, createSortedRowModel, SortingState, stockFeatures, tableFeatures, useTable } from "@tanstack/react-table"
 import { InventoryTableBody } from "./InventoryTableBody";
 import { InventoryTableHeader } from "./InventoryTableHeader";
+import { InventoryCards } from "./InventoryCards";
+import { Accordion } from '@heroui/react';
 
 type InventoryTableProps = {
     productList: stockRow[]//stockRow1行分の在庫データ
@@ -117,7 +119,7 @@ export function InventoryTable({
     );
 
     return (
-        <div>
+        <div className="mx-auto w-full max-w-5xl">
             {/* <InventoryCheckbox columns={dateColumns} />
 
             <InventorySort columns={sortColumns} /> */}
@@ -153,12 +155,18 @@ export function InventoryTable({
                     次へ
                 </button>
             </nav>
-            {/* <InventoryCards rows={table.getRowModel().rows} /> */}
-
+            {/* スマホ用の表 */}
+            <div className="min-[481px]:hidden">
+                <InventoryCards
+                    rows={table.getRowModel().rows as unknown as Parameters<typeof InventoryCards>[0]["rows"]}
+                />
+            </div>
             {/* PC用の表 */}
-            <div className="mt-4 hidden md:block">
+            <div className="mt-4 hidden min-[481px]:block">
                 <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
-                    <table className="w-full min-w-[420px] border-collapse text-base leading-6">
+                    <table className="w-full min-w-[420px] table-fixed border-collapse text-base leading-6
+                        [&_th]:text-center [&_td]:px-3 [&_td]:py-2 [&_td]:text-center
+                        [&_td]:wrap-anywhere">
                         <InventoryTableHeader
                             headerGroups={table.getHeaderGroups()}
                         />
