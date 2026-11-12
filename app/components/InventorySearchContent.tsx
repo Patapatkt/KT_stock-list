@@ -2,7 +2,7 @@
 
 import { getProducts } from "../libs/getProducts";
 import type { HomeProps } from "../page";
-import {InventoryTable} from "./InventoryTable";
+import { TanstackTable } from "./InventoryTable";
 
 
 // 関数作成
@@ -31,7 +31,7 @@ export async function SeachContent({
                 ) : productList.length === 0 ? (
                     <p>検索条件に一致する商品はありません。</p>
                 ) : (
-                    <InventoryTable
+                    <TanstackTable
                         productList ={productList}
                     />
                 )

@@ -3,7 +3,7 @@ import { defineConfig } from "drizzle-kit";
 
 // Drizzle Kitが使用するスキーマと接続先
 export default defineConfig({
-    schema: "./app/libs/shema.ts",//読込み先のschema.tsを指定
+    schema: "./app/libs/schema.ts",//読込み先のschema.tsを指定
     dialect: "sqlite",//DBの種類を指定
     dbCredentials: {
         url: "stock-list.db",//反映先のDBを指定

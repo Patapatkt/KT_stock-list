@@ -22,15 +22,15 @@ export function SearchForm({
         const mediaQuery = window.matchMedia("(max-width:480px)");
         const updateIsMobile = () => setIsMobile(mediaQuery.matches)
         updateIsMobile();
-        
-        mediaQuery.addEventListener("change",updateIsMobile);
 
-        return()=> mediaQuery.removeEventListener("change", updateIsMobile);
-    },[]);
-    
+        mediaQuery.addEventListener("change", updateIsMobile);
+
+        return () => mediaQuery.removeEventListener("change", updateIsMobile);
+    }, []);
+
 
     return (
-        
+
         <form
             action="/"
             method="get"
@@ -43,12 +43,12 @@ export function SearchForm({
             {/* 狭い画面では縦並び、広い画面では入力欄とボタンを横並びにする */}
             <div className=" grid grid-cols-1 gap-3 lg:items-end">
                 <Accordion
-                    expandedKeys={!isMobile ||isSearchOpen ? ["search-fields"] : []}
+                    expandedKeys={!isMobile || isSearchOpen ? ["search-fields"] : []}
                     onExpandedChange={(keys) => setIsSearchOpen(keys.has("search-fields"))}
                     className="w-full max-w-md">
                     <Accordion.Item id="search-fields">
                         <Accordion.Heading
-                            className={isMobile?undefined:"hidden"}
+                            className={isMobile ? undefined : "hidden"}
                         >
                             <Accordion.Trigger>
                                 {isSearchOpen ? "検索条件を閉じる" : "検索条件を開く"}
@@ -116,16 +116,17 @@ export function SearchForm({
                                             前方部分一致でも検索可
                                         </Description>
                                     </div>
+
+
+                                    {/* フォームを送信し、入力値をURLのクエリに載せる */}
+                                    <Button type="submit" variant="primary" className="w-full h-11 lg:w-auto">
+                                        検索
+                                    </Button>
                                 </TextField>
                             </Accordion.Body>
                         </Accordion.Panel>
                     </Accordion.Item>
                 </Accordion>
-
-                {/* フォームを送信し、入力値をURLのクエリに載せる */}
-                <Button type="submit" variant="primary" className="w-full h-11 lg:w-auto">
-                    検索
-                </Button>
             </div>
         </form >
     );

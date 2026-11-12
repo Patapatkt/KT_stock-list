@@ -1,5 +1,5 @@
 // 入力時の検証ルール
-import {z} from "zod"
+import { z } from "zod"
 
 export const productSchema = z.object({
     shelf: z
@@ -15,20 +15,38 @@ export const productSchema = z.object({
         .trim()
         .optional(),
 })
-export type CreateStockConditions =z.infer<typeof productSchema>
+export type CreateStockConditions = z.infer<typeof productSchema>
 // 検索時の入力値の検証ルール
 export const searchSchema = z.object({
-    shelf:productSchema.shape.shelf,
-    productName:productSchema.shape.productName,
-    inquiry:productSchema.shape.inquiry,
+    shelf: productSchema.shape.shelf,
+    productName: productSchema.shape.productName,
+    inquiry: productSchema.shape.inquiry,
     quantity: z
         .int()
         .min(1)
         .max(
-        Number.MAX_SAFE_INTEGER,
-        "数量が大きすぎます",
-    ),
-    memo:z
+            Number.MAX_SAFE_INTEGER,
+            "数量が大きすぎます",
+        ),
+    memo: z
         .string()
         .optional(),//入力は任意
-})
+});
+
+// 入出庫履歴の入力ルール
+export const historySchema = z.object({
+    id: z.number()
+        .int()
+        .min(1),
+    createdAt: z
+    .iso.datetime({local:true})
+    .optional(),
+    shelf: productSchema.shape.shelf,
+    productName: productSchema.shape.productName,
+    inquiry: productSchema.shape.inquiry,
+    movementType: z
+        .enum(["IN","OUT"])
+        .optional()
+});
+
+export type History = z.infer<typeof historySchema>

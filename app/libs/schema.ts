@@ -13,3 +13,18 @@ export const stocks = sqliteTable(
         memo: text("memo").notNull().default(""),//メモ(任意入力)
     }
 )
+
+// historiesのテーブル定義
+export const histories =sqliteTable(
+    "histories",
+    {
+        id: integer("id").primaryKey(),//識別のためのid
+        createdAt:text("createdAt").notNull(),
+        movementType:text("type",{enum:["IN","OUT"]}).notNull(),
+        shelf: text("shelf").notNull(),//棚番
+        productName: text("productName").notNull(),//商品名
+        inquiry: text("inquiry").notNull(),//仕様
+        quantity: integer("quantity").notNull(),//入出庫時の数量
+        memo: text("memo").notNull().default(""),//メモ(任意入力)
+    }
+)
