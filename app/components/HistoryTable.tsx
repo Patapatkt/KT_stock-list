@@ -1,175 +1,193 @@
 "use client";
 
-import { ColumnDef, createPaginatedRowModel, createSortedRowModel, SortingState, stockFeatures, tableFeatures, useTable } from "@tanstack/react-table";
-import { useState } from "react";
-import { NewDate } from "./NewDate";
-import type { History } from "../model/stock";
+import { createColumnHelper, createPaginatedRowModel, createSortedRowModel, flexRender, SortingState, stockFeatures, tableFeatures, useTable } from "@tanstack/react-table";
+import { useMemo, useState } from "react";
+import { Pagination, SortDescriptor, Table } from "@heroui/react";
+import { HistoryCards } from "./HistoryCard";
+import { historyRow } from "../libs/getHistories";
 
 // 入出庫履歴の表示コンポーネント
 type HistoryTableProps = {
-    historyList: History[];
+  historyList: historyRow[];
 }
 
 export type HistoryTableFeatures = typeof features;
 
 // 標準機能に、実際に行を並び替える処理を追加する
 const features = tableFeatures({
-    ...stockFeatures,
-    sortedRowModel: createSortedRowModel(),
-    // ページネーション追加
-    paginatedRowModel: createPaginatedRowModel(),
+  ...stockFeatures,
+  sortedRowModel: createSortedRowModel(),
+  // ページネーション追加
+  paginatedRowModel: createPaginatedRowModel(),
 })
 
-const columns: ColumnDef<typeof features, History>[] = [
-    {
-        accessorKey: "createdAt",
-        header: "最終更新時間",
-        cell: (info) => {
-            const value = info.getValue<string | null>();
+const columnHelper = createColumnHelper<typeof features, historyRow>();
 
-            if (!value) {
-                return "—";
-            }
+const columns = columnHelper.columns([
+  columnHelper.accessor("createdAt", {
+    header: "入出庫時間",
+    cell: ({ getValue }) => getValue()?.replace("T", "-") ?? "",
+  }),
+  columnHelper.accessor("shelf", { header: "棚番" }),
+  columnHelper.accessor("productName", { header: "商品名" }),
+  columnHelper.accessor("inquiry", { header: "仕様" }),
+  columnHelper.accessor("movementType", {
+    header: "区分",
+    cell: ({ getValue }) => {
+      const movementType = getValue();
+      return movementType === "IN" ? "入庫" : movementType ==="OUT"?"出庫":""
+    }}),
+  columnHelper.accessor("quantity", { header: "数量" }),
+]);
 
-            return <NewDate value={value} />;
-        },
-    },
-    {
-        accessorKey: "shelf",
-        header: "棚番",
-        sortFn: (rowA, rowB) =>
-            (rowA.original.shelf ?? "").localeCompare(
-                rowB.original.shelf ?? "",
-                "ja",
-            )
-    },
-    {
-        accessorKey: "productName",
-        header: "商品名",
-        // 昇順の比較を定義し、降順への反転はテーブルに任せる
-        sortFn: (rowA, rowB) =>
-            (rowA.original.productName ?? "").localeCompare(
-                rowB.original.productName ?? "",
-                "ja",
-            ),
-    },
-    {
-        accessorKey: "inquiry",
-        header: "仕様",
-        sortFn: (rowA, rowB) =>
-            (rowA.original.inquiry ?? "").localeCompare(
-                rowB.original.inquiry ?? "",
-                "ja",
-            ),
-    },
-    {
-        accessorKey: "movementType",
-        header: "入出庫",
-        sortFn: (rowA, rowB) =>
-            (rowA.original.movementType ?? "").localeCompare(
-                rowB.original.movementType ?? "",
-                "ja",
-            ),
-    },
-]
+// --- Sorting Bridge -------------------------------------------------------
+// Convert TanStack SortingState → React Aria SortDescriptor
+function toSortDescriptor(sorting: SortingState): SortDescriptor | undefined {
+  const first = sorting[0];
+
+  if (!first) return undefined;
+
+  return {
+    column: first.id,
+    direction: first.desc ? "descending" : "ascending",
+  };
+}
+// Convert React Aria SortDescriptor → TanStack SortingState
+function toSortingState(descriptor: SortDescriptor): SortingState {
+  return [{ desc: descriptor.direction === "descending", id: descriptor.column as string }];
+}
+
+// --- Component ------------------------------------------------------------
+const PAGE_SIZE = 4;
 
 export function HistoryTable({
-    historyList,
+  historyList,
 }: HistoryTableProps) {
-    // 初期表示は棚番の昇順
-    const [sorting, setSorting] = useState<SortingState>([
-        { id: "shelf", desc: false },
-    ]);
+  const tableData = useMemo(
+    () => historyList.map((history) => ({
+      ...history,
+      createdAt: history.createdAt ?? "",
+      shelf: history.shelf ?? "",
+      productName: history.productName ?? "",
+      inquiry: history.inquiry ?? "",
+      movementType: history.movementType ?? "",
+      memo: "",
+    })),
+    [historyList],
+  );
 
-    const table = useTable({
-        features,
+  // 初期表示は更新時間の昇順
+  const [sorting, setSorting] = useState<SortingState>([
+    { id: "createdAt", desc: false },
+  ]);
 
-        data: historyList,
-        columns,
-        getRowId: (histories) => String(histories.id),
+  const table = useTable({
+    features,
 
-        // 初期表示では日時2列を非表示にする
-        initialState: {
-            columnVisibility: {
-                lastReceivedAt: false,
-                lastShippedAt: false,
-            },
-            // ページネーション追加
-            pagination: {
-                pageIndex: 0,//0が1ページ目
-                pageSize: 10,//1ページに表示する件数
-            },
-        },
+    data: tableData,
+    columns,
+    initialState: { pagination: { pageIndex: 0, pageSize: PAGE_SIZE } },
+    onSortingChange: setSorting,
+    state: { sorting },
 
-        // ソート状態をReactで管理する
-        state: {
-            sorting,
-        },
-        onSortingChange: setSorting,
+  });
 
-        // ページネーション追加
+  const sortDescriptor = useMemo(() => toSortDescriptor(sorting), [sorting]);
 
-        autoResetAll: true, // データが変わったらソート状態をリセットする
+  const { pageIndex } = table.state.pagination;
+  const pageCount = table.getPageCount();
+  const pages = Array.from({ length: pageCount }, (_, i) => i + 1);
+  const start = historyList.length === 0 ? 0 : pageIndex * PAGE_SIZE + 1;
+  const end = Math.min((pageIndex + 1) * PAGE_SIZE, historyList.length);
 
-        // 昇順と降順の2通りで切り替える
-        enableSortingRemoval: false,
-        enableMultiSort: false,
-    });
+  const rows = table.getRowModel().rows; //現在のテーブルの行を取得
 
-    // 並び替えボタンに使う列を取得する
-    const sortColumns = table.getAllLeafColumns().filter(
-        (column) =>
-            column.id === "shelf" ||
-            column.id === "productName" ||
-            column.id === "inquiry",
-    );
-
-    return (
-        <div>
-            {/* <InventoryCheckbox columns={dateColumns} />
-
-            <InventorySort columns={sortColumns} /> */}
-            {/* ページネーション追加 */}
-            <nav
-                aria-label="在庫一覧のページ切り替え"
-                className="my-4 flex flex-wrap items-center gap-3"
-            >
-                <button
-                    type="button"
-                    onClick={() => table.previousPage()}
-                    disabled={!table.getCanPreviousPage()}
-                    className="rounded border px-3 py-2 disabled:cursor-not-allowed disabled:opacity-40"
+  return (
+    <div className="flex w-full min-w-0 flex-col gap-4">
+      <div className="min-[481px]:hidden">
+        <HistoryCards
+          historyList={rows.map(({ original }) => original)}
+        />
+      </div>
+      <Table>
+        <Table.ScrollContainer
+          className="hidden min-[481px]:block">
+          <Table.Content
+            aria-label="TanStack Table example"
+            className="min-w-[600px]"
+            sortDescriptor={sortDescriptor}
+            onSortChange={(d) => setSorting(toSortingState(d))}
+          >
+            <Table.Header>
+              {table.getHeaderGroups()[0]?.headers.map((header) => (
+                <Table.Column
+                  key={header.id}
+                  allowsSorting={header.column.getCanSort()}
+                  id={header.id}
+                  isRowHeader={header.id === "shelf"}
                 >
-                    前へ
-                </button>
-
-                <span aria-live="polite">
-                    {table.getPageCount() === 0
-                        ? 0
-                        : table.state.pagination.pageIndex + 1}
-                    {" / "}
-                    {table.getPageCount()} ページ
-                    （全{historyList.length}件）
-                </span>
-
-                <button
-                    type="button"
-                    onClick={() => table.nextPage()}
-                    disabled={!table.getCanNextPage()}
-                    className="rounded border px-3 py-2 disabled:cursor-not-allowed disabled:opacity-40"
+                  {({ sortDirection }) => (
+                    <Table.SortableColumnHeader sortDirection={sortDirection}>
+                      {flexRender(header.column.columnDef.header, header.getContext())}
+                    </Table.SortableColumnHeader>
+                  )}
+                </Table.Column>
+              ))}
+            </Table.Header>
+            <Table.Body>
+              {table.getRowModel().rows.map((row) => (
+                <Table.Row key={row.id} id={row.id}>
+                  {row.getAllCells().map((cell) => (
+                    <Table.Cell key={cell.id}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </Table.Cell>
+                  ))}
+                </Table.Row>
+              ))}
+            </Table.Body>
+          </Table.Content>
+        </Table.ScrollContainer>
+        <Table.Footer>
+          <Pagination size="sm">
+            <Pagination.Summary>
+              {historyList.length === 0
+                ? "該当する入出庫履歴はありません"
+                : `全${historyList.length}件中${start} ～ ${end}件`
+              }
+            </Pagination.Summary>
+            <Pagination.Content>
+              <Pagination.Item>
+                <Pagination.Previous
+                  isDisabled={!table.getCanPreviousPage()}
+                  onPress={() => table.previousPage()}
                 >
-                    次へ
-                </button>
-            </nav>
-
-            {/* PC用の表 */}
-            <div className="mt-4 hidden md:block">
-                <div className="table-wrapper">
-                    <table className="common-table">
-                        
-                    </table>
-                </div>
-            </div>
-        </div>
-    );
+                  <Pagination.PreviousIcon />
+                  Prev
+                </Pagination.Previous>
+              </Pagination.Item>
+              {pages.map((p) => (
+                <Pagination.Item key={p}>
+                  <Pagination.Link
+                    isActive={p === pageIndex + 1}
+                    onPress={() => table.setPageIndex(p - 1)}
+                  >
+                    {p}
+                  </Pagination.Link>
+                </Pagination.Item>
+              ))}
+              <Pagination.Item>
+                <Pagination.Next
+                  isDisabled={!table.getCanNextPage()}
+                  onPress={() => table.nextPage()}
+                >
+                  Next
+                  <Pagination.NextIcon />
+                </Pagination.Next>
+              </Pagination.Item>
+            </Pagination.Content>
+          </Pagination>
+        </Table.Footer>
+      </Table>
+    </div>
+  );
 }

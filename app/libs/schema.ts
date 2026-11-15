@@ -20,7 +20,7 @@ export const histories =sqliteTable(
     {
         id: integer("id").primaryKey(),//識別のためのid
         createdAt:text("createdAt").notNull(),
-        movementType:text("type",{enum:["IN","OUT"]}).notNull(),
+        movementType:text("type").notNull(),
         shelf: text("shelf").notNull(),//棚番
         productName: text("productName").notNull(),//商品名
         inquiry: text("inquiry").notNull(),//仕様

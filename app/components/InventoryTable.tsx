@@ -23,7 +23,7 @@ type InventoryTableProps = {
 	productList: stockRow[]//stockRow1行分の在庫データ
 }
 
-export type InventoryTableFeatures = typeof features
+export type InventoryTableFeatures = typeof features;
 
 // --- TanStack Features & Column Definitions -------------------------------
 const features = tableFeatures({
@@ -97,82 +97,90 @@ export function TanstackTable(
 					products={rows.map((row) => row.original)}
 				/>
 			</div>
-			<Table>
-				<Table.ScrollContainer
-					className="hidden min-[481px]:block">
-					<Table.Content
-						aria-label="TanStack Table example"
-						className="min-w-[600px]"
-						sortDescriptor={sortDescriptor}
-						onSortChange={(d) => setSorting(toSortingState(d))}
-					>
-						<Table.Header>
-							{table.getHeaderGroups()[0]?.headers.map((header) => (
-								<Table.Column
-									key={header.id}
-									allowsSorting={header.column.getCanSort()}
-									id={header.id}
-									isRowHeader={header.id === "shelf"}
-								>
-									{({ sortDirection }) => (
-										<Table.SortableColumnHeader sortDirection={sortDirection}>
-											{flexRender(header.column.columnDef.header, header.getContext())}
-										</Table.SortableColumnHeader>
-									)}
-								</Table.Column>
-							))}
-						</Table.Header>
-						<Table.Body>
-							{table.getRowModel().rows.map((row) => (
-								<Table.Row key={row.id} id={row.id}>
-									{row.getAllCells().map((cell) => (
-										<Table.Cell key={cell.id}>
-											{flexRender(cell.column.columnDef.cell, cell.getContext())}
-										</Table.Cell>
-									))}
-								</Table.Row>
-							))}
-						</Table.Body>
-					</Table.Content>
-				</Table.ScrollContainer>
-				<Table.Footer>
-					<Pagination size="sm">
-						<Pagination.Summary>
-							{start} to {end} of {productList.length} results
-						</Pagination.Summary>
-						<Pagination.Content>
-							<Pagination.Item>
-								<Pagination.Previous
-									isDisabled={!table.getCanPreviousPage()}
-									onPress={() => table.previousPage()}
-								>
-									<Pagination.PreviousIcon />
-									Prev
-								</Pagination.Previous>
-							</Pagination.Item>
-							{pages.map((p) => (
-								<Pagination.Item key={p}>
-									<Pagination.Link
-										isActive={p === pageIndex + 1}
-										onPress={() => table.setPageIndex(p - 1)}
+			<div className="w-full rounded-2xl border border-gray-500">
+				<Table>
+					<Table.ScrollContainer
+						className="hidden min-[481px]:block">
+						<Table.Content
+							aria-label="TanStack Table example"
+							className="min-w-[600px]"
+							sortDescriptor={sortDescriptor}
+							onSortChange={(d) => setSorting(toSortingState(d))}
+						>
+							<Table.Header>
+								{table.getHeaderGroups()[0]?.headers.map((header) => (
+									<Table.Column
+										key={header.id}
+										allowsSorting={header.column.getCanSort()}
+										id={header.id}
+										isRowHeader={header.id === "shelf"}
+										className="text-base font-semibold border-r border-black-500 last:border-r-0"
 									>
-										{p}
-									</Pagination.Link>
+										{({ sortDirection }) => (
+											<Table.SortableColumnHeader sortDirection={sortDirection}>
+												{flexRender(header.column.columnDef.header, header.getContext())}
+											</Table.SortableColumnHeader>
+										)}
+									</Table.Column>
+								))}
+							</Table.Header>
+							<Table.Body>
+								{table.getRowModel().rows.map((row) => (
+									<Table.Row key={row.id} id={row.id} className="group">
+										{row.getAllCells().map((cell) => (
+											<Table.Cell key={cell.id}
+												className="border-r border-black-500 bg-white group-hover:bg-gray-100 last:border-r-0"
+											>
+												{flexRender(cell.column.columnDef.cell, cell.getContext())}
+											</Table.Cell>
+										))}
+									</Table.Row>
+								))}
+							</Table.Body>
+						</Table.Content>
+					</Table.ScrollContainer>
+					<Table.Footer>
+						<Pagination size="sm">
+							<Pagination.Summary>
+								{productList.length === 0
+									? "該当する入出庫履歴はありません"
+									: `全${productList.length}件中${start} ～ ${end}件`
+								}
+							</Pagination.Summary>
+							<Pagination.Content>
+								<Pagination.Item>
+									<Pagination.Previous
+										isDisabled={!table.getCanPreviousPage()}
+										onPress={() => table.previousPage()}
+									>
+										<Pagination.PreviousIcon />
+										前ページへ
+									</Pagination.Previous>
 								</Pagination.Item>
-							))}
-							<Pagination.Item>
-								<Pagination.Next
-									isDisabled={!table.getCanNextPage()}
-									onPress={() => table.nextPage()}
-								>
-									Next
-									<Pagination.NextIcon />
-								</Pagination.Next>
-							</Pagination.Item>
-						</Pagination.Content>
-					</Pagination>
-				</Table.Footer>
-			</Table>
+								{pages.map((p) => (
+									<Pagination.Item key={p}>
+										<Pagination.Link
+											isActive={p === pageIndex + 1}
+											onPress={() => table.setPageIndex(p - 1)}
+										>
+											{p}
+										</Pagination.Link>
+									</Pagination.Item>
+								))}
+								<Pagination.Item>
+									<Pagination.Next
+										isDisabled={!table.getCanNextPage()}
+										onPress={() => table.nextPage()}
+									>
+										次ページへ
+										<Pagination.NextIcon />
+									</Pagination.Next>
+								</Pagination.Item>
+							</Pagination.Content>
+						</Pagination>
+					</Table.Footer>
+				</Table>
+			</div>
 		</div>
 	);
 }

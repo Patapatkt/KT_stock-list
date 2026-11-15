@@ -12,7 +12,6 @@ export async function SeachContent({
 
     // URLから検索条件を受け取る
     const params =await searchParams
-    const {shelf,productName,inquiry} =  params
     // 各引数が文字列か確認し文字列ではなかったら空白にする
     const SearchShelf = typeof params.shelf === "string" ? params.shelf : "";
     const SearchProductName = typeof params.productName === "string" ? params.productName : "";

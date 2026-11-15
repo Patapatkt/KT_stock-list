@@ -1,5 +1,5 @@
 // Db接続　drizzleDbの定義
-
+import "server-only";
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 // SQLiteのDBファイルを開き、接続をdbに入れる

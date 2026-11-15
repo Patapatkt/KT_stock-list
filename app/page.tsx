@@ -1,4 +1,5 @@
 // 親ページ在庫一覧を返す
+import { Link } from "@heroui/react";
 import { SeachContent } from "./components/InventorySearchContent";
 import { SearchForm } from "./components/SearchForm";
 
@@ -16,7 +17,7 @@ export default async function Home(
   // 分割代入でsearchParamsから値を取り出す
   const { shelf, productName, inquiry } = await searchParams
   return (
-    <div className="min-h-screen w-full bg-slate-100 font-sans text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+    <div className="min-h-screen w-full bg-gray-400 font-sans text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       {/* ページ全幅にタイトル帯を表示する */}
       <header className="border-b border-slate-800 bg-slate-900 text-white">
         <div className="mx-auto max-w-5xl px-4 py-5 text-center sm:px-6">
@@ -39,6 +40,14 @@ export default async function Home(
             searchParams={searchParams}
           />
         </div>
+        <div className="flex justify-end">
+        <Link
+          href="/history"
+          className="inline-flex h-11 items-center justify-center rounded-lg bg-slate-900 px-4 font-semibold text-white hover:bg-slate-700"
+        >
+          入出庫履歴へ
+        </Link>
+      </div>
       </main>
     </div>
   );

@@ -49,6 +49,15 @@ export function InventoryCards(
             </dd>
           </div>
 
+          <div className="grid grid-cols-[7rem_minmax(0,1fr)] gap-3">
+            <dt className="font-semibold text-slate-600">
+              現在庫
+            </dt>
+            <dd className="min-w-0 wrap-anywhere">
+              {product.quantity}
+            </dd>
+          </div>
+
         </article>
       ))}
 

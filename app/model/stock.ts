@@ -38,7 +38,10 @@ export const historySchema = z.object({
     id: z.number()
         .int()
         .min(1),
-    createdAt: z
+    createdAtFrom: z
+    .iso.datetime({local:true})
+    .optional(),
+    createdAtTo: z
     .iso.datetime({local:true})
     .optional(),
     shelf: productSchema.shape.shelf,
@@ -46,7 +49,23 @@ export const historySchema = z.object({
     inquiry: productSchema.shape.inquiry,
     movementType: z
         .enum(["IN","OUT"])
-        .optional()
+        .optional(),
+    quantity:searchSchema.shape.quantity
 });
 
 export type History = z.infer<typeof historySchema>
+
+export const historySearchSchema = z.object({
+    createdAtFrom: z
+    .iso.datetime({local:true})
+    .optional(),
+    createdAtTo: z
+    .iso.datetime({local:true})
+    .optional(),
+    shelf: productSchema.shape.shelf,
+    productName: productSchema.shape.productName,
+    inquiry: productSchema.shape.inquiry,
+    movementType: z
+        .enum(["IN","OUT"])
+        .optional(),
+});
