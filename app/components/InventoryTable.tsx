@@ -64,7 +64,7 @@ function toSortingState(descriptor: SortDescriptor): SortingState {
 }
 
 // --- Component ------------------------------------------------------------
-const PAGE_SIZE = 4;
+const PAGE_SIZE = 100;
 
 export function TanstackTable(
 	{ productList }: InventoryTableProps
@@ -114,7 +114,7 @@ export function TanstackTable(
 										allowsSorting={header.column.getCanSort()}
 										id={header.id}
 										isRowHeader={header.id === "shelf"}
-										className="text-base font-semibold border-r border-black-500 last:border-r-0"
+										className="text-base font-semibold border-r border-gray-500 last:border-r-0"
 									>
 										{({ sortDirection }) => (
 											<Table.SortableColumnHeader sortDirection={sortDirection}>
@@ -125,11 +125,11 @@ export function TanstackTable(
 								))}
 							</Table.Header>
 							<Table.Body>
-								{table.getRowModel().rows.map((row) => (
+								{rows.map((row) => (
 									<Table.Row key={row.id} id={row.id} className="group">
 										{row.getAllCells().map((cell) => (
 											<Table.Cell key={cell.id}
-												className="border-r border-black-500 bg-white group-hover:bg-gray-100 last:border-r-0"
+												className="border-r border-gray-500 bg-white group-hover:bg-gray-100 last:border-r-0"
 											>
 												{flexRender(cell.column.columnDef.cell, cell.getContext())}
 											</Table.Cell>
@@ -143,7 +143,7 @@ export function TanstackTable(
 						<Pagination size="sm">
 							<Pagination.Summary>
 								{productList.length === 0
-									? "該当する入出庫履歴はありません"
+									? "検索条件に一致する商品はありません"
 									: `全${productList.length}件中${start} ～ ${end}件`
 								}
 							</Pagination.Summary>

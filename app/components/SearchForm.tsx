@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button, Description, Input, Label, TextField } from "@heroui/react";
 import { Accordion } from "@heroui/react";
 import { BiChevronDown } from "react-icons/bi";
@@ -24,8 +24,7 @@ export function SearchForm({
 			action="/"
 			method="get"
 			aria-label="在庫検索"
-			className="mx-auto w-full max-w-lg rounded-xl border border-zinc-200 bg-white p-4
-                       dark:border-zinc-700 dark:bg-zinc-900 sm:p-5"
+			className="mx-auto w-full max-w-lg rounded-xl p-4 sm:p-5"
 		>
 
 			{/* 狭い画面では縦並び、広い画面では入力欄とボタンを横並びにする */}
@@ -51,7 +50,7 @@ export function SearchForm({
 							</Accordion.Trigger>
 						</Accordion.Heading>
 						<Accordion.Panel>
-							<Accordion.Body className="grid gap-3">
+							<Accordion.Body className="grid gap-3 bg-white rounded-lg">
 								<TextField
 									name="shelf"
 									defaultValue={typeof shelf === "string" ? shelf : ""}
@@ -112,7 +111,7 @@ export function SearchForm({
 
 
 									{/* フォームを送信し、入力値をURLのクエリに載せる */}
-									<Button type="submit" variant="primary" className="w-full h-11 lg:w-auto">
+									<Button type="submit" variant="primary" className="text-end w-full h-11 lg:w-auto">
 										検索
 									</Button>
 								</TextField>
