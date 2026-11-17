@@ -2,7 +2,6 @@
 
 import type { SortDescriptor } from "@heroui/react";
 import type { SortingState } from "@tanstack/react-table";
-
 import { Pagination, Table } from "@heroui/react";
 import {
 	createColumnHelper,
@@ -15,8 +14,9 @@ import {
 	tableFeatures,
 	useTable,
 } from "@tanstack/react-table";
-import { useMemo, useState } from "react";
-import { stockRow } from "../libs/getProducts";
+import { useCreateAtom, useSelector } from "@tanstack/react-store";//ver9変更
+import { useMemo } from "react";
+import type { stockRow } from "../libs/getProducts";
 import { InventoryCards } from "./InventoryCards";
 
 type InventoryTableProps = {
@@ -64,25 +64,34 @@ function toSortingState(descriptor: SortDescriptor): SortingState {
 }
 
 // --- Component ------------------------------------------------------------
-const PAGE_SIZE = 100;
+const PAGE_SIZE = 1;
 
 export function TanstackTable(
 	{ productList }: InventoryTableProps
 ) {
-	const [sorting, setSorting] = useState<SortingState>([]);
+	// ver9変更const [sorting, setSorting] = useState<SortingState>([]);
+	const sortingAtom = useCreateAtom<SortingState>([])
+	const sorting =useSelector(sortingAtom)
 
 	const table = useTable({
 		columns,
-		data: productList,
+		data:productList,
 		features,
-		initialState: { pagination: { pageIndex: 0, pageSize: PAGE_SIZE } },
-		onSortingChange: setSorting,
-		state: { sorting },
+		atoms:{
+			sorting:sortingAtom
+		},
+		// ver9変更
+		initialState:{
+			pagination:{
+				pageIndex:0,
+				pageSize:PAGE_SIZE,
+			}
+		}
 	});
 
 	const sortDescriptor = useMemo(() => toSortDescriptor(sorting), [sorting]);
 
-	const { pageIndex } = table.state.pagination;
+	const { pageIndex,pageSize } = table.state.pagination;
 	const pageCount = table.getPageCount();
 	const pages = Array.from({ length: pageCount }, (_, i) => i + 1);
 	const start = pageIndex * PAGE_SIZE + 1;
@@ -105,7 +114,8 @@ export function TanstackTable(
 							aria-label="TanStack Table example"
 							className="min-w-[600px]"
 							sortDescriptor={sortDescriptor}
-							onSortChange={(d) => setSorting(toSortingState(d))}
+							// ver9変更
+							onSortChange={(descriptor) => table.setSorting(toSortingState(descriptor))}
 						>
 							<Table.Header>
 								{table.getHeaderGroups()[0]?.headers.map((header) => (
