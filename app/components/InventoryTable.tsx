@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import type { SortDescriptor } from "@heroui/react";
 import type { SortingState } from "@tanstack/react-table";
 import { Pagination, Table } from "@heroui/react";
@@ -66,38 +67,39 @@ function toSortingState(descriptor: SortDescriptor): SortingState {
 // --- Component ------------------------------------------------------------
 const PAGE_SIZE = 1;
 
-export function TanstackTable(
+export function InventoryTable(
 	{ productList }: InventoryTableProps
 ) {
-	// ver9変更const [sorting, setSorting] = useState<SortingState>([]);
 	const sortingAtom = useCreateAtom<SortingState>([])
-	const sorting =useSelector(sortingAtom)
+	const sorting = useSelector(sortingAtom)
 
 	const table = useTable({
 		columns,
-		data:productList,
+		data: productList,
 		features,
-		atoms:{
-			sorting:sortingAtom
+		atoms: {
+			sorting: sortingAtom
 		},
-		// ver9変更
-		initialState:{
-			pagination:{
-				pageIndex:0,
-				pageSize:PAGE_SIZE,
+		initialState: {
+			pagination: {
+				pageIndex: 0,
+				pageSize: PAGE_SIZE,
 			}
 		}
 	});
 
 	const sortDescriptor = useMemo(() => toSortDescriptor(sorting), [sorting]);
 
-	const { pageIndex,pageSize } = table.state.pagination;
+	const { pageIndex, pageSize } = table.state.pagination;
 	const pageCount = table.getPageCount();
 	const pages = Array.from({ length: pageCount }, (_, i) => i + 1);
 	const start = pageIndex * PAGE_SIZE + 1;
 	const end = Math.min((pageIndex + 1) * PAGE_SIZE, productList.length);
 
 	const rows = table.getRowModel().rows; //現在のテーブルの行を取得
+
+	// 11/18追加
+	const router = useRouter()
 
 	return (
 		<div className="flex w-full min-w-0 flex-col gap-4">
@@ -114,8 +116,19 @@ export function TanstackTable(
 							aria-label="TanStack Table example"
 							className="min-w-[600px]"
 							sortDescriptor={sortDescriptor}
-							// ver9変更
-							onSortChange={(descriptor) => table.setSorting(toSortingState(descriptor))}
+							// 11/18
+							onSortChange={(descriptor) => {
+								table.setSorting(toSortingState(descriptor));
+
+								const sortDirection =
+									descriptor.direction === "ascending" ? "asc" : "desc";
+
+								const params = new URLSearchParams(window.location.search);
+								params.set("sortDirection", sortDirection);
+								params.set("sortBy", String(descriptor.column));
+
+								router.push(`?${params.toString()}`);
+							}}
 						>
 							<Table.Header>
 								{table.getHeaderGroups()[0]?.headers.map((header) => (

@@ -8,6 +8,8 @@ export type HomeProps = {
     shelf?: string | string[];//string[]複数ある場合に対応
     productName?: string | string[];
     inquiry?: string | string[];
+    sortDirection?: string | string[]; //11/18追加
+    sortBy?: string | string[];
   }>;
 };
 
@@ -41,13 +43,13 @@ export default async function Home(
           />
         </div>
         <div className="flex justify-end">
-        <Link
-          href="/history"
-          className="inline-flex h-11 items-center justify-center rounded-lg bg-slate-900 px-4 font-semibold text-white hover:bg-slate-700"
-        >
-          入出庫履歴へ
-        </Link>
-      </div>
+          <Link
+            href="/history"
+            className="inline-flex h-11 items-center justify-center rounded-lg bg-slate-900 px-4 font-semibold text-white hover:bg-slate-700"
+          >
+            入出庫履歴へ
+          </Link>
+        </div>
       </main>
     </div>
   );

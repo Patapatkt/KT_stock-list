@@ -14,6 +14,9 @@ export const productSchema = z.object({
         .string()
         .trim()
         .optional(),
+    // 11/18検証条件にソートの昇順か降順を追加
+    sortDirection:z
+    .enum(["asc","desc"]).default("desc"),
 })
 export type CreateStockConditions = z.infer<typeof productSchema>
 // 検索時の入力値の検証ルール

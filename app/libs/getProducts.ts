@@ -1,7 +1,7 @@
 // 検索条件をZodで検証し、DBを検索して結果を返す
 
 import { productSchema } from "@/app/model/stock"
-import { and, like } from "drizzle-orm";
+import { and, asc, desc, like } from "drizzle-orm";
 import { stocks } from "./schema";
 import { drizzleDb } from "./db";
 // 引数の型作成
@@ -9,6 +9,8 @@ type ProductsSearchCondition = {
     shelf: string,
     productName: string,
     inquiry: string,
+    sortDirection?: string | string[],
+    sortBy?: string | undefined;
 }
 
 export type stockRow = typeof stocks.$inferSelect
@@ -19,6 +21,16 @@ export async function getProducts(
 ): Promise<{
     productList: stockRow[];
     error: string | null;
+    // 11/18入力欄の検索条件が適用中か判断する
+    appliedFilters: {
+        shelf?: string;
+        productName?: string;
+        inquiry?: string;
+    };
+    appliedSort: {
+        sortBy: "id";
+        sortDirection: "asc" | "desc"
+    } | null;
 }> {
     const parsed = productSchema.safeParse(conditions)
     if (!parsed.success) {
@@ -26,20 +38,23 @@ export async function getProducts(
             productList: [],
             error: parsed.error.issues[0]?.message
                 ?? "検索条件を入力してください",
+            // 11/18// 在庫検索に実際に適用した条件
+            appliedFilters: {},
+            // // 11/18// 在庫検索に実際に適用したソート
+            appliedSort: null,
         }
     }
-    // 分割代入で検証済の値から入力値を取り出す
-    const { shelf, productName, inquiry } = parsed.data
+    // 11/18sortDirectionの分割代入追加
+    const { shelf, productName, inquiry, sortDirection } = parsed.data
+    const sortOrder =
+        sortDirection === "asc" ? asc(stocks.id) : desc(stocks.id);
 
     const result = await drizzleDb
         .select()
-        .from(stocks)//stocksテーブルより
-        // 下記条件で絞り込み
+        .from(stocks)
         .where(
-            //andで複数の条件
             and(
-                shelf//棚番列にてstockテーブルの棚番と分割代入で取り出した棚番が
-                    //前方部分一致しているか
+                shelf
                     ? like(stocks.shelf, `${shelf}%`)
                     : undefined,
                 productName
@@ -50,10 +65,28 @@ export async function getProducts(
                     : undefined
             )
         )
-    return {
-        // 検索条件に一致した在庫データ1行を返す
-        productList: result,
-        error: null
-    }
+        .orderBy(
+            // 11/18変更
+            sortOrder,
+        )
 
+    const appliedFiltersShelf = shelf ? { shelf } : undefined;
+    const appliedFiltersProductName = productName ? { productName } : undefined;
+    const appliedFiltersInquiry = inquiry ? { inquiry } : undefined;
+
+    return {
+        productList: result,
+        error: null,
+        // 11/18追加
+        appliedFilters: {
+            ...appliedFiltersShelf,
+            ...appliedFiltersProductName,
+            ...appliedFiltersInquiry
+        },
+        // 11/18追加
+        appliedSort: {
+            sortBy: "id",
+            sortDirection
+        }
+    }
 }
