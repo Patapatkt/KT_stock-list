@@ -31,10 +31,6 @@ const features = tableFeatures({
 	paginatedRowModel: createPaginatedRowModel(),
 	rowPaginationFeature,
 	rowSortingFeature,
-	sortFns: {
-		alphanumeric: sortFn_alphanumeric,
-	},
-	sortedRowModel: createSortedRowModel(),
 });
 
 const columnHelper = createColumnHelper<typeof features, stockRow>();
@@ -77,6 +73,7 @@ export function InventoryTable(
 		columns,
 		data: productList,
 		features,
+		manualSorting:true,
 		atoms: {
 			sorting: sortingAtom
 		},
@@ -90,7 +87,7 @@ export function InventoryTable(
 
 	const sortDescriptor = useMemo(() => toSortDescriptor(sorting), [sorting]);
 
-	const { pageIndex, pageSize } = table.state.pagination;
+	const { pageIndex } = table.state.pagination;
 	const pageCount = table.getPageCount();
 	const pages = Array.from({ length: pageCount }, (_, i) => i + 1);
 	const start = pageIndex * PAGE_SIZE + 1;

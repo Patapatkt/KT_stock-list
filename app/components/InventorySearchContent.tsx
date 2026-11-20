@@ -27,6 +27,13 @@ export async function SeachContent({
 			sortDirection,
 			sortBy,
 		})
+	const sortLabels ={
+		shelf:"棚番",
+		id:"id",
+		productName:"商品名",
+		inquiry:"仕様",
+		quantity:"現在庫"
+	}
 
 	return (
 		<div className="flex flex-col gap-2">
@@ -41,7 +48,7 @@ export async function SeachContent({
 			)}
 			{appliedSort && (
 				<p>
-					DBでの並び順：IDの{appliedSort.sortDirection === "asc" ? "昇順" : "降順"}
+					DBでの並び順：{sortLabels[appliedSort.sortBy]}の{appliedSort.sortDirection === "asc" ? "昇順" : "降順"}
 				</p>
 			)}
 			{

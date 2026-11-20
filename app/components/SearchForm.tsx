@@ -51,6 +51,7 @@ export function SearchForm({
 						</Accordion.Heading>
 						<Accordion.Panel>
 							<Accordion.Body className="grid gap-3 bg-white rounded-lg">
+								{/* ここにスマホ版min-480pxだったら選択欄を表示 */}
 								<TextField
 									name="shelf"
 									defaultValue={typeof shelf === "string" ? shelf : ""}
@@ -108,9 +109,6 @@ export function SearchForm({
 											前方部分一致でも検索可
 										</Description>
 									</div>
-
-
-									{/* フォームを送信し、入力値をURLのクエリに載せる */}
 									<Button type="submit" variant="primary" className="text-end w-full h-11 lg:w-auto">
 										検索
 									</Button>
@@ -119,6 +117,29 @@ export function SearchForm({
 						</Accordion.Panel>
 					</Accordion.Item>
 				</Accordion>
+				<div
+					className="grid gap-3 min-[481px]:hidden"
+				>
+					<label>
+						並べる項目
+						<select name="sortBy" >
+							<option value="shelf">棚番</option>
+							<option value="productName">商品名</option>
+							<option value="inquiry">仕様</option>
+							<option value="quantity">現在庫</option>
+						</select>
+					</label>
+					<label>
+						昇順・降順
+						<select name="sortDirection">
+							<option value="asc">昇順</option>
+							<option value="desc">降順</option>
+						</select>
+					</label>
+					<Button type="submit" variant="primary">
+						並べ替え
+					</Button>
+				</div>
 			</div>
 		</form >
 	);
