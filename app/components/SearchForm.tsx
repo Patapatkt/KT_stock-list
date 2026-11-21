@@ -109,37 +109,46 @@ export function SearchForm({
 											前方部分一致でも検索可
 										</Description>
 									</div>
-									<Button type="submit" variant="primary" className="text-end w-full h-11 lg:w-auto">
-										検索
-									</Button>
 								</TextField>
+								<div
+									className="grid gap-3 rounded-xl border border-slate-200 bg-white p-4 shadow-sm min-[481px]:hidden">
+									<div className="grid grid-cols-1 gap-3 min-[400px]:grid-cols-2">
+										<label className="grid min-w-0 gap-1.5 text-sm font-medium text-slate-800">
+											並べる項目
+											<select
+												name="sortBy"
+												className="min-h-11 w-full rounded-lg border border-slate-400 bg-white px-3 text-base text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+											>
+												<option value="">項目を選択</option>
+												<option value="shelf">棚番</option>
+												<option value="productName">商品名</option>
+												<option value="inquiry">仕様</option>
+												<option value="quantity">現在庫</option>
+											</select>
+										</label>
+										<label className="grid min-w-0 gap-1.5 text-sm font-medium text-slate-800">
+											昇順・降順
+											<select
+												name="sortDirection"
+												className="min-h-11 w-full rounded-lg border border-slate-400 bg-white px-3 text-base text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+											>
+												<option value="">順序を選択</option>
+												<option value="asc">昇順</option>
+												<option value="desc">降順</option>
+											</select>
+										</label>
+									</div>
+									<Button type="submit" variant="primary">
+										並べ替え
+									</Button>
+								</div>
+								<Button type="submit" variant="primary" className="text-end w-full h-11 lg:w-auto">
+									検索
+								</Button>
 							</Accordion.Body>
 						</Accordion.Panel>
 					</Accordion.Item>
 				</Accordion>
-				<div
-					className="grid gap-3 min-[481px]:hidden"
-				>
-					<label>
-						並べる項目
-						<select name="sortBy" >
-							<option value="shelf">棚番</option>
-							<option value="productName">商品名</option>
-							<option value="inquiry">仕様</option>
-							<option value="quantity">現在庫</option>
-						</select>
-					</label>
-					<label>
-						昇順・降順
-						<select name="sortDirection">
-							<option value="asc">昇順</option>
-							<option value="desc">降順</option>
-						</select>
-					</label>
-					<Button type="submit" variant="primary">
-						並べ替え
-					</Button>
-				</div>
 			</div>
 		</form >
 	);

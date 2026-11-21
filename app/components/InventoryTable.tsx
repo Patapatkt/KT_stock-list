@@ -7,11 +7,9 @@ import { Pagination, Table } from "@heroui/react";
 import {
 	createColumnHelper,
 	createPaginatedRowModel,
-	createSortedRowModel,
 	flexRender,
 	rowPaginationFeature,
 	rowSortingFeature,
-	sortFn_alphanumeric,
 	tableFeatures,
 	useTable,
 } from "@tanstack/react-table";
