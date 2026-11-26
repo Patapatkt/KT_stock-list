@@ -5,8 +5,8 @@ import { SearchForm } from "./components/SearchForm";
 
 export type HomeProps = {
   searchParams: Promise<{
-    shelf?: string | string[];//string[]複数ある場合に対応
-    productName?: string | string[];
+    location?: string | string[];//string[]複数ある場合に対応
+    productNumber?: string | string[];
     inquiry?: string | string[];
     sortDirection?: string | string[]; //11/18追加
     sortBy?: string | string[];
@@ -17,7 +17,7 @@ export default async function Home(
   { searchParams }: HomeProps//定義した型からSearchParamsを取り出す
 ) {
   // 分割代入でsearchParamsから値を取り出す
-  const { shelf, productName, inquiry } = await searchParams
+  const { location, productNumber, inquiry } = await searchParams
   return (
     <div className="min-h-screen w-full bg-gray-400 font-sans text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       {/* ページ全幅にタイトル帯を表示する */}
@@ -32,8 +32,8 @@ export default async function Home(
       <main className="mx-auto flex w-full max-w-5xl flex-col  item-center gap-6 px-4 py-6 sm:px-6 sm:py-8">
         <div className="flex w-full justify-center">
           <SearchForm
-            shelf={shelf}
-            productName={productName}
+            location={location}
+            productNumber={productNumber}
             inquiry={inquiry}
           />
         </div>

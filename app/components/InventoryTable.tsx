@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import type { SortDescriptor } from "@heroui/react";
 import type { SortingState } from "@tanstack/react-table";
 import { Pagination, Table } from "@heroui/react";
@@ -14,7 +14,7 @@ import {
 	useTable,
 } from "@tanstack/react-table";
 import { useCreateAtom, useSelector } from "@tanstack/react-store";//ver9変更
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import type { stockRow } from "../libs/getProducts";
 import { InventoryCards } from "./InventoryCards";
 
@@ -34,8 +34,8 @@ const features = tableFeatures({
 const columnHelper = createColumnHelper<typeof features, stockRow>();
 
 const columns = columnHelper.columns([
-	columnHelper.accessor("shelf", { header: "棚番" }),
-	columnHelper.accessor("productName", { header: "商品名" }),
+	columnHelper.accessor("location", { header: "棚番" }),
+	columnHelper.accessor("productNumber", { header: "商品名" }),
 	columnHelper.accessor("inquiry", { header: "仕様" }),
 	columnHelper.accessor("quantity", { header: "現在庫" }),
 ]);
@@ -71,7 +71,6 @@ export function InventoryTable(
 		columns,
 		data: productList,
 		features,
-		manualSorting:true,
 		atoms: {
 			sorting: sortingAtom
 		},
@@ -93,8 +92,30 @@ export function InventoryTable(
 
 	const rows = table.getRowModel().rows; //現在のテーブルの行を取得
 
-	// 11/18追加
 	const router = useRouter()
+
+	const searchParams = useSearchParams();
+	const pageParam = searchParams.get("page");
+
+	useEffect(() => {
+		const requestedPage = Number(pageParam ?? "1");
+		const validPage =
+			Number.isSafeInteger(requestedPage) && requestedPage >= 1
+				? requestedPage
+				: 1;
+
+		const nextPageIndex = Math.min(validPage, Math.max(pageCount, 1)) - 1;
+
+		if (pageIndex !== nextPageIndex) {
+			table.setPageIndex(nextPageIndex);
+		}
+	}, [pageParam, pageCount, pageIndex, table]);
+
+	function goToPage(page: number) {		
+		const params = new URLSearchParams(window.location.search);
+		params.set("page", String(page));
+		router.push(`?${params.toString()}`);
+	}
 
 	return (
 		<div className="flex w-full min-w-0 flex-col gap-4">
@@ -111,7 +132,6 @@ export function InventoryTable(
 							aria-label="TanStack Table example"
 							className="min-w-[600px]"
 							sortDescriptor={sortDescriptor}
-							// 11/18
 							onSortChange={(descriptor) => {
 								table.setSorting(toSortingState(descriptor));
 
@@ -131,7 +151,7 @@ export function InventoryTable(
 										key={header.id}
 										allowsSorting={header.column.getCanSort()}
 										id={header.id}
-										isRowHeader={header.id === "shelf"}
+										isRowHeader={header.id === "location"}
 										className="text-base font-semibold border-r border-gray-500 last:border-r-0"
 									>
 										{({ sortDirection }) => (
@@ -169,7 +189,7 @@ export function InventoryTable(
 								<Pagination.Item>
 									<Pagination.Previous
 										isDisabled={!table.getCanPreviousPage()}
-										onPress={() => table.previousPage()}
+										onPress={() => goToPage(pageIndex)}
 									>
 										<Pagination.PreviousIcon />
 										前ページへ
@@ -179,7 +199,9 @@ export function InventoryTable(
 									<Pagination.Item key={p}>
 										<Pagination.Link
 											isActive={p === pageIndex + 1}
-											onPress={() => table.setPageIndex(p - 1)}
+											onPress={() => {
+												goToPage(pageIndex + 1)
+											}}
 										>
 											{p}
 										</Pagination.Link>
@@ -188,7 +210,7 @@ export function InventoryTable(
 								<Pagination.Item>
 									<Pagination.Next
 										isDisabled={!table.getCanNextPage()}
-										onPress={() => table.nextPage()}
+										onPress={() => goToPage(pageIndex + 2)}
 									>
 										次ページへ
 										<Pagination.NextIcon />

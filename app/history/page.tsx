@@ -6,8 +6,8 @@ export type HistoryProps = {
     searchParams: Promise<{
         createdAtFrom?: string | string[];
         createdAtTo?: string | string[];
-        shelf?: string | string[];
-        productName?: string | string[];
+        location?: string | string[];
+        productNumber?: string | string[];
         inquiry?: string | string[];
         quantity?: string | string[];
         movementType?: "IN" | "OUT" | undefined;
@@ -18,7 +18,7 @@ export default async function StockHistory({
     searchParams }: HistoryProps
 ) {
     const {
-        createdAtFrom, createdAtTo, shelf, productName, inquiry, movementType
+        createdAtFrom, createdAtTo, location, productNumber, inquiry, movementType
     } = await searchParams
 
     return (
@@ -37,8 +37,8 @@ export default async function StockHistory({
                     <HistorySearchForm
                         createdAtFrom={createdAtFrom}
                         createdAtTo={createdAtTo ?? ""}
-                        shelf={shelf}
-                        productName={productName}
+                        location={location}
+                        productNumber={productNumber}
                         inquiry={inquiry}
                         movementType={movementType}
                     />

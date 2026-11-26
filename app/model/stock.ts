@@ -2,11 +2,11 @@
 import { z } from "zod"
 
 export const productSchema = z.object({
-    shelf: z
+    location: z
         .string()
         .trim()
         .optional(),
-    productName: z//商品名の入力ルールは文字列・前後の空白を取り除く
+    productNumber: z//商品名の入力ルールは文字列・前後の空白を取り除く
         .string()
         .trim()
         .optional(),
@@ -16,13 +16,13 @@ export const productSchema = z.object({
         .optional(),
     // 11/18検証条件にソートの昇順か降順を追加
     sortDirection:z
-    .enum(["asc","desc"]).default("desc"),
+    .enum(["asc","desc"]).optional(),
 })
 export type CreateStockConditions = z.infer<typeof productSchema>
 // 検索時の入力値の検証ルール
 export const searchSchema = z.object({
-    shelf: productSchema.shape.shelf,
-    productName: productSchema.shape.productName,
+    location: productSchema.shape.location,
+    productNumber: productSchema.shape.productNumber,
     inquiry: productSchema.shape.inquiry,
     quantity: z
         .int()
@@ -47,8 +47,8 @@ export const historySchema = z.object({
     createdAtTo: z
     .iso.datetime({local:true})
     .optional(),
-    shelf: productSchema.shape.shelf,
-    productName: productSchema.shape.productName,
+    location: productSchema.shape.location,
+    productNumber: productSchema.shape.productNumber,
     inquiry: productSchema.shape.inquiry,
     movementType: z
         .enum(["IN","OUT"])
@@ -65,8 +65,8 @@ export const historySearchSchema = z.object({
     createdAtTo: z
     .iso.datetime({local:true})
     .optional(),
-    shelf: productSchema.shape.shelf,
-    productName: productSchema.shape.productName,
+    location: productSchema.shape.location,
+    productNumber: productSchema.shape.productNumber,
     inquiry: productSchema.shape.inquiry,
     movementType: z
         .enum(["IN","OUT"])

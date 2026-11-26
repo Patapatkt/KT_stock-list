@@ -28,8 +28,8 @@ const columns = columnHelper.columns([
     header: "入出庫時間",
     cell: ({ getValue }) => getValue()?.replace("T", "-") ?? "",
   }),
-  columnHelper.accessor("shelf", { header: "棚番" }),
-  columnHelper.accessor("productName", { header: "商品名" }),
+  columnHelper.accessor("location", { header: "棚番" }),
+  columnHelper.accessor("productNumber", { header: "商品名" }),
   columnHelper.accessor("inquiry", { header: "仕様" }),
   columnHelper.accessor("movementType", {
     header: "区分",
@@ -67,8 +67,8 @@ export function HistoryTable({
     () => historyList.map((history) => ({
       ...history,
       createdAt: history.createdAt ?? "",
-      shelf: history.shelf ?? "",
-      productName: history.productName ?? "",
+      location: history.location ?? "",
+      productNumber: history.productNumber ?? "",
       inquiry: history.inquiry ?? "",
       movementType: history.movementType ?? "",
       memo: "",
@@ -124,7 +124,7 @@ export function HistoryTable({
                   key={header.id}
                   allowsSorting={header.column.getCanSort()}
                   id={header.id}
-                  isRowHeader={header.id === "shelf"}
+                  isRowHeader={header.id === "location"}
                 >
                   {({ sortDirection }) => (
                     <Table.SortableColumnHeader sortDirection={sortDirection}>

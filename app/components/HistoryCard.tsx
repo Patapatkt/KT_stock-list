@@ -36,7 +36,7 @@ export function HistoryCards(
               棚番
             </dt>
             <dd className="min-w-0 wrap-anywhere">
-              {history.shelf}
+              {history.location}
             </dd>
           </div>
 
@@ -45,7 +45,7 @@ export function HistoryCards(
               商品名
             </dt>
             <dd className="min-w-0 wrap-anywhere">
-              {history.productName}
+              {history.productNumber}
             </dd>
           </div>
 

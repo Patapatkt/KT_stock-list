@@ -27,7 +27,7 @@ export function InventoryCards(
               棚番
             </dt>
             <dd className="min-w-0 wrap-anywhere">
-              {product.shelf}
+              {product.location}
             </dd>
           </div>
 
@@ -36,7 +36,7 @@ export function InventoryCards(
               商品名
             </dt>
             <dd className="min-w-0 wrap-anywhere">
-              {product.productName}
+              {product.productNumber}
             </dd>
           </div>
 

@@ -7,14 +7,14 @@ import { BiChevronDown } from "react-icons/bi";
 import { FcSearch } from "react-icons/fc";
 
 type SearchFormProps = {
-	shelf?: string | string[];
-	productName?: string | string[];
+	location?: string | string[];
+	productNumber?: string | string[];
 	inquiry?: string | string[];
 };
 
 export function SearchForm({
-	shelf,
-	productName,
+	location,
+	productNumber,
 	inquiry,
 }: SearchFormProps) {
 	const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -53,8 +53,8 @@ export function SearchForm({
 							<Accordion.Body className="grid gap-3 bg-white rounded-lg">
 								{/* ここにスマホ版min-480pxだったら選択欄を表示 */}
 								<TextField
-									name="shelf"
-									defaultValue={typeof shelf === "string" ? shelf : ""}
+									name="location"
+									defaultValue={typeof location === "string" ? location : ""}
 									className="min-w-0"
 								>
 									<Label>棚番</Label>
@@ -75,8 +75,8 @@ export function SearchForm({
 								</TextField>
 
 								<TextField
-									name="productName"
-									defaultValue={typeof productName === "string" ? productName : ""}
+									name="productNumber"
+									defaultValue={typeof productNumber === "string" ? productNumber : ""}
 									className="min-w-0"
 								>
 									<Label>商品名</Label>
@@ -120,8 +120,8 @@ export function SearchForm({
 												className="min-h-11 w-full rounded-lg border border-slate-400 bg-white px-3 text-base text-slate-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
 											>
 												<option value="">項目を選択</option>
-												<option value="shelf">棚番</option>
-												<option value="productName">商品名</option>
+												<option value="location">棚番</option>
+												<option value="productNumber">商品名</option>
 												<option value="inquiry">仕様</option>
 												<option value="quantity">現在庫</option>
 											</select>

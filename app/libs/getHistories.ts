@@ -8,8 +8,8 @@ import { histories } from "./schema";
 type HistoriesSearchCondition = {
     createdAtFrom:string |string[],
     createdAtTo:string |string[],
-    shelf: string |string[],
-    productName: string |string[],
+    location: string |string[],
+    productNumber: string |string[],
     inquiry: string |string[],
     movementType:string | string[],
 }
@@ -39,7 +39,7 @@ export async function getHistories(
         }
     }
     
-    const {createdAtFrom,createdAtTo,shelf,productName,inquiry,movementType} = parsed.data
+    const {createdAtFrom,createdAtTo,location,productNumber,inquiry,movementType} = parsed.data
     const result = await drizzleDb
         .select()
         .from(histories)
@@ -51,12 +51,12 @@ export async function getHistories(
                 createdAtTo
                     ?lt(histories.createdAt,createdAtTo)
                     :undefined,
-                shelf//棚番列にてstockテーブルの棚番と分割代入で取り出した棚番が
+                location//棚番列にてstockテーブルの棚番と分割代入で取り出した棚番が
                     //前方部分一致しているか
-                    ? like(histories.shelf, `${shelf}%`)
+                    ? like(histories.location, `${location}%`)
                     : undefined,
-                productName
-                    ? like(histories.productName, `${productName}%`)
+                productNumber
+                    ? like(histories.productNumber, `${productNumber}%`)
                     : undefined,
                 inquiry
                     ? like(histories.inquiry, `${inquiry}%`)

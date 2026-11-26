@@ -6,8 +6,8 @@ import { stocks } from "./schema";
 import { drizzleDb } from "./db";
 // 引数の型作成
 type ProductsSearchCondition = {
-	shelf: string,
-	productName: string,
+	location: string,
+	productNumber: string,
 	inquiry: string,
 	sortDirection?: string | string[],
 	sortBy?: string | undefined;
@@ -22,16 +22,21 @@ export async function getProducts(
 	productList: stockRow[];
 	error: string | null;
 	appliedFilters: {
-		shelf?: string;
-		productName?: string;
+		location?: string;
+		productNumber?: string;
 		inquiry?: string;
 	};
 	appliedSort: {
-		sortBy: "id" | "productName" | "shelf" | "inquiry" | "quantity";
+		sortBy: "id" | "productNumber" | "location" | "inquiry" | "quantity";
 		sortDirection: "asc" | "desc"
 	} | null;
 }> {
-	const parsed = productSchema.safeParse(conditions)
+	const parsed = productSchema.safeParse({
+		...conditions,
+		sortDirection:
+			conditions.sortDirection === "" ? undefined : conditions.sortDirection,
+	})
+
 	if (!parsed.success) {
 		return {
 			productList: [],
@@ -44,36 +49,37 @@ export async function getProducts(
 		}
 	}
 	// 11/18sortDirectionの分割代入追加
-	const { shelf, productName, inquiry, sortDirection } = parsed.data
+	const { location, productNumber, inquiry, sortDirection } = parsed.data
 	const sortBy = conditions.sortBy
 	const appliedSortBy =
-		sortBy === "shelf" || sortBy === "productName" || sortBy === "inquiry" || sortBy === "quantity"
+		sortBy === "location" || sortBy === "productNumber" || sortBy === "inquiry" || sortBy === "quantity"
 			? sortBy
 			: "id";
 	const sortColumn =
-		appliedSortBy === "shelf"
-			? stocks.shelf
-			:appliedSortBy === "productName"
-				?stocks.productName
-				:appliedSortBy==="inquiry" 
-					?stocks.inquiry
-					:appliedSortBy==="quantity"
-					?stocks.quantity
-					:stocks.id
+		appliedSortBy === "location"
+			? stocks.location
+			: appliedSortBy === "productNumber"
+				? stocks.productNumber
+				: appliedSortBy === "inquiry"
+					? stocks.inquiry
+					: appliedSortBy === "quantity"
+						? stocks.quantity
+						: stocks.id
+
+	const appliedSortDirection = sortDirection ?? "desc";
 	const sortOrder =
-		sortDirection === "asc" ? asc(sortColumn) : desc(sortColumn);
+		appliedSortDirection === "asc" ? asc(sortColumn) : desc(sortColumn);
 
-
-	const result = await drizzleDb
+		const result = await drizzleDb
 		.select()
 		.from(stocks)
 		.where(
 			and(
-				shelf
-					? like(stocks.shelf, `${shelf}%`)
+				location
+					? like(stocks.location, `${location}%`)
 					: undefined,
-				productName
-					? like(stocks.productName, `${productName}%`)
+				productNumber
+					? like(stocks.productNumber, `${productNumber}%`)
 					: undefined,
 				inquiry
 					? like(stocks.inquiry, `${inquiry}%`)
@@ -84,21 +90,21 @@ export async function getProducts(
 			sortOrder,
 		)
 
-	const appliedFiltersShelf = shelf ? { shelf } : undefined;
-	const appliedFiltersProductName = productName ? { productName } : undefined;
+	const appliedFilterslocation = location ? { location } : undefined;
+	const appliedFiltersproductNumber = productNumber ? { productNumber } : undefined;
 	const appliedFiltersInquiry = inquiry ? { inquiry } : undefined;
 
 	return {
 		productList: result,
 		error: null,
 		appliedFilters: {
-			...appliedFiltersShelf,
-			...appliedFiltersProductName,
+			...appliedFilterslocation,
+			...appliedFiltersproductNumber,
 			...appliedFiltersInquiry
 		},
 		appliedSort: {
 			sortBy: appliedSortBy,
-			sortDirection
+			sortDirection: appliedSortDirection,
 		}
 	}
 }

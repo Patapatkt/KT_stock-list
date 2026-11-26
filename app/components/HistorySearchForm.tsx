@@ -8,8 +8,8 @@ import { FcSearch } from "react-icons/fc";
 type HistorySearchFormProps = {
 	createdAtFrom?: string | string[];//検索開始時間
 	createdAtTo: string | string[],//検索終了時間
-	shelf?: string | string[];//棚番
-	productName?: string | string[];//商品名
+	location?: string | string[];//棚番
+	productNumber?: string | string[];//商品名
 	inquiry?: string | string[];//仕様
 	movementType?: string | string[]//区分        
 }
@@ -17,8 +17,8 @@ type HistorySearchFormProps = {
 export function HistorySearchForm({
 	createdAtFrom,
 	createdAtTo,
-	shelf,
-	productName,
+	location,
+	productNumber,
 	inquiry,
 	movementType,
 }: HistorySearchFormProps) {
@@ -72,8 +72,8 @@ export function HistorySearchForm({
 								</TextField>
 
 								<TextField
-									name="shelf"
-									defaultValue={typeof shelf === "string" ? shelf : ""}
+									name="location"
+									defaultValue={typeof location === "string" ? location : ""}
 									className="min-w-0"
 								>
 									<Label>棚番</Label>
@@ -92,8 +92,8 @@ export function HistorySearchForm({
 								</TextField>
 
 								<TextField
-									name="productName"
-									defaultValue={typeof productName === "string" ? productName : ""}
+									name="productNumber"
+									defaultValue={typeof productNumber === "string" ? productNumber : ""}
 									className="min-w-0"
 								>
 									<div className="mt-1 grid grid-cols-1 gap-2 min-[481px]:grid-cols-[minmax(0,2fr)_minmax(0,1fr)] 

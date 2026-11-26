@@ -9,15 +9,15 @@ export async function HistoryContent(
     const params = await searchParams
     const historyCreatedAtFrom = typeof params.createdAtFrom === "string" ? params.createdAtFrom : "";
     const historyCreatedAtTo = typeof params.createdAtTo === "string" ? params.createdAtTo : "";
-    const historyShelf = typeof params.shelf === "string" ? params.shelf : "";
-    const historyProductName = typeof params.productName === "string" ? params.productName : "";
+    const historylocation = typeof params.location === "string" ? params.location : "";
+    const historyproductNumber = typeof params.productNumber === "string" ? params.productNumber : "";
     const historyInquiry = typeof params.inquiry === "string" ? params.inquiry : "";
     const historyMovementType = typeof params.movementType === "string" ? params.movementType : "";
     const { histories, error } = await getHistories({
         createdAtFrom: historyCreatedAtFrom,
         createdAtTo:historyCreatedAtTo,
-        shelf: historyShelf,
-        productName: historyProductName,
+        location: historylocation,
+        productNumber: historyproductNumber,
         inquiry: historyInquiry,
         movementType: historyMovementType,
     });
