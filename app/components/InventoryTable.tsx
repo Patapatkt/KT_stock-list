@@ -17,6 +17,7 @@ import { useCreateAtom, useSelector } from "@tanstack/react-store";//ver9変更
 import { useEffect, useMemo } from "react";
 import type { stockRow } from "../libs/getProducts";
 import { InventoryCards } from "./InventoryCards";
+import { PageNation } from "../libs/pageNation";
 
 type InventoryTableProps = {
 	productList: stockRow[]//stockRow1行分の在庫データ
@@ -71,15 +72,15 @@ export function InventoryTable(
 		columns,
 		data: productList,
 		features,
-		atoms: {
-			sorting: sortingAtom
-		},
 		initialState: {
 			pagination: {
 				pageIndex: 0,
 				pageSize: PAGE_SIZE,
-			}
-		}
+			},
+		},
+		atoms: {
+			sorting: sortingAtom
+		},
 	});
 
 	const sortDescriptor = useMemo(() => toSortDescriptor(sorting), [sorting]);
@@ -88,30 +89,30 @@ export function InventoryTable(
 	const pageCount = table.getPageCount();
 	const pages = Array.from({ length: pageCount }, (_, i) => i + 1);
 	const start = pageIndex * PAGE_SIZE + 1;
-	const end = Math.min((pageIndex + 1) * PAGE_SIZE, productList.length);
-
-	const rows = table.getRowModel().rows; //現在のテーブルの行を取得
-
 	const router = useRouter()
 
 	const searchParams = useSearchParams();
 	const pageParam = searchParams.get("page");
+	const { page,totalCount, error: pageError } = PageNation({
+		productList, PAGE_SIZE, pageParam
+	})
+
+	const end = Math.min((pageIndex + 1) * PAGE_SIZE, totalCount);
+
+	const rows = table.getRowModel().rows; //現在のテーブルの行を取得
 
 	useEffect(() => {
-		const requestedPage = Number(pageParam ?? "1");
-		const validPage =
-			Number.isSafeInteger(requestedPage) && requestedPage >= 1
-				? requestedPage
-				: 1;
+		const nextPageIndex = page - 1
 
-		const nextPageIndex = Math.min(validPage, Math.max(pageCount, 1)) - 1;
-
-		if (pageIndex !== nextPageIndex) {
+		if (!pageError && pageIndex !== nextPageIndex) {
 			table.setPageIndex(nextPageIndex);
 		}
-	}, [pageParam, pageCount, pageIndex, table]);
+	}, [page,pageError, pageIndex, table]);
 
-	function goToPage(page: number) {		
+	if (pageError) {
+		return <p>{pageError}</p>
+	}
+	function goToPage(page: number) {
 		const params = new URLSearchParams(window.location.search);
 		params.set("page", String(page));
 		router.push(`?${params.toString()}`);
@@ -180,9 +181,9 @@ export function InventoryTable(
 					<Table.Footer>
 						<Pagination size="sm">
 							<Pagination.Summary>
-								{productList.length === 0
+								{totalCount === 0
 									? "検索条件に一致する商品はありません"
-									: `全${productList.length}件中${start} ～ ${end}件`
+									: `全${totalCount}件中${start} ～ ${end}件`
 								}
 							</Pagination.Summary>
 							<Pagination.Content>
@@ -200,7 +201,7 @@ export function InventoryTable(
 										<Pagination.Link
 											isActive={p === pageIndex + 1}
 											onPress={() => {
-												goToPage(pageIndex + 1)
+												goToPage(p)
 											}}
 										>
 											{p}

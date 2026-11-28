@@ -15,12 +15,19 @@ export function PageNation(
     const page =
         Number.isSafeInteger(requestedPage) && requestedPage >= 1
             ? requestedPage// ・指定されたページの行を在庫一覧から取り出す
-            : 1;//・ページ指定がなければ1ページ目を使う
-    const start = (page - 1) * PAGE_SIZE
-    const end = start + PAGE_SIZE;
+            : 1;
+    const totalCount = productList.length;
+    const totalPage = Math.ceil(totalCount / PAGE_SIZE)
+    if (pageParam !== null && page > totalPage) {
+        return ({
+            totalCount, page,
+            error: `指定されたページはありません`
+        })
+    }
 
     return ({
-        pageRows: productList.slice(start, end),// 指定されたページの在庫行
-        totalCount: productList.length// 検索条件に一致した全件数
+        totalCount,// 検索条件に一致した全件数
+        page,
+        error: null,
     })
 }
